@@ -91,8 +91,15 @@ int doc_parse(Doc *doc) {
 			buf[r] = '\0';
 
 			tmp = node_add_text(tmp, buf);
+			stateptr = strstr(stateptr, "<");
+		} else {
+			r = strcspn(txt, "<");
+			strncpy(buf, txt, r);
+			buf[r] = '\0';
+
+			tmp = node_add_text(tmp, buf);
+			stateptr = strstr(txt, "<");
 		}
-		stateptr = strstr(stateptr? stateptr: txt, "<");
 		if (!stateptr)
 			continue;
 		stateptr += 1;
