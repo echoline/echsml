@@ -5,4 +5,4 @@ this function:
 
 creates structs based on a well-formed xml document.
 
-See test.c for example and doc.h for stuct definitions.
+See test.c for example and doc.h for struct definitions.
