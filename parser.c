@@ -14,6 +14,30 @@ char *pushtxt(FILE *file, char *txt, char *stateptr) {
 	return fgets(&txt[len], BUFSIZ-len-1, file);
 }
 
+void attrib_parse(Node *n, char *s) {
+	if (!n || !s || !strlen(s))
+		return;
+
+	char *p = s;
+	char *name;
+	char *value;
+	while (*p) {
+		p += strspn(p, "\n\t ");
+		if (!strchr(p, '='))
+			return;
+
+		p[strcspn(p, "=")] = '\0';
+		name = strdup(p);
+		p += strlen(p) + 1;
+			
+		p[strcspn(p, "\n\t /")] = '\0';
+		value = strdup(p);
+		p += strlen(p) + 1;
+
+		node_add_attrib(n, name, value);
+	}
+}
+
 int doc_parse(Doc *doc) {
 	char txt[BUFSIZ];
 	char buf[BUFSIZ];
@@ -47,12 +71,16 @@ int doc_parse(Doc *doc) {
 			r = cptr - stateptr;
 			strncpy(buf, stateptr, r);
 			buf[r] = '\0';
-			// TODO: store attribs
-			buf[strcspn(buf, "\n\t ")] = '\0';
-			tmp = new_node(buf);
+			buf[strcspn(buf, "\n\t /")] = '\0';
 			stateptr += r;
+			tmp = new_node(buf);
+
+			cptr = buf + strlen(buf) + 1;
+			attrib_parse(tmp, cptr);
 
 			doc_new_root(doc, tmp);
+			if (*(stateptr - 1) == '/')
+				tmp = NULL;
 			continue;
 		}
 		
@@ -83,7 +111,7 @@ int doc_parse(Doc *doc) {
 			strncpy(buf, stateptr, r);
 			buf[r] = '\0';
 			if (strcasecmp(buf, tmp->name)) {
-				fprintf(stderr, "malformed tag: %s\n", tmp->name);
+				fprintf(stderr, "malformed tag: <%s></%s>\n", tmp->name, buf);
 			}
 			tmp = tmp->parent;
 			stateptr += r;
@@ -101,11 +129,18 @@ int doc_parse(Doc *doc) {
 		r = cptr - stateptr;
 		strncpy(buf, stateptr, r);
 		buf[r] = '\0';
-		// TODO: store attribs
-		buf[strcspn(buf, "\n\t ")] = '\0';
+		buf[strcspn(buf, "\n\t /")] = '\0';
 		stateptr += r;
 
-		tmp = node_add_child(tmp, new_node(buf));
+		r = (*(stateptr - 1) == '/');
+		tmp = node_add_child(tmp, new_node(buf), r);
+
+		cptr = buf + strlen(buf) + 1;
+		attrib_parse(tmp, cptr);
+
+		if (r) {
+			tmp = tmp->parent;
+		}
 	}
 	return 0;
 }

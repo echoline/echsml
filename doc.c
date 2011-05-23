@@ -32,12 +32,16 @@ Node *new_node(char *n) {
 	ret->name = strdup(n);
 	ret->numchildren = 0;
 	ret->children = (Child**)calloc(1, sizeof(Child*));
+	ret->numattribs = 0;
+	ret->attribs = (Attrib**)calloc(1, sizeof(Attrib*));
 	return ret;
 }
 
-Node *node_add_child(Node *parent, Node *child) {
+Node *node_add_child(Node *parent, Node *child, char single) {
 	if (!parent || !child)
 		return NULL;
+
+	child->single = single;
 
 	parent->children[parent->numchildren] = (Child*)
 						calloc(1, sizeof(Child));
@@ -50,6 +54,20 @@ Node *node_add_child(Node *parent, Node *child) {
 
 	child->parent = parent;
 	return child;
+}
+
+Node *node_add_attrib(Node *n, char *name, char *value) {
+	if (!n || !name || !value)
+		return n;
+
+	n->attribs[n->numattribs] = (Attrib*)calloc(1, sizeof(Attrib*));
+	n->attribs[n->numattribs]->name = name;
+	n->attribs[n->numattribs]->value = value;
+	n->numattribs++;
+	n->attribs = realloc(n->attribs, (n->numattribs + 1) * sizeof(Attrib*));
+	n->attribs[n->numattribs] = NULL;
+
+	return n;
 }
 
 Node *node_add_text(Node *parent, char *txt) {
@@ -66,4 +84,41 @@ Node *node_add_text(Node *parent, char *txt) {
 	parent->children[parent->numchildren] = NULL;
 
 	return parent;
+}
+
+void printnode(Node *n) {
+	int i;
+	if (n->single) {
+		printf("<%s", n->name);
+		for (i = 0; n->attribs[i]; i++) {
+			printf(" %s=%s", n->attribs[i]->name, n->attribs[i]->value);
+		}
+		printf("/>");
+		return;
+	}
+	printf("<%s", n->name);
+	for (i = 0; n->attribs[i]; i++) {
+		printf(" %s=%s", n->attribs[i]->name, n->attribs[i]->value);
+	}
+	printf(">");
+	for (i = 0; n->children[i]; i++) {
+		if (n->children[i]->type == NODE)
+			printnode(n->children[i]->u.n);
+		else if (n->children[i]->type == CSTR)
+			printf("%s", n->children[i]->u.c);
+		else
+			exit(-1);
+	}
+	printf("</%s>", n->name);
+}
+
+void printdoc(Doc *doc) {
+	int j;
+	if (!doc)
+		return;
+
+	for (j = 0; doc->roots[j]; j++) {
+		printnode(doc->roots[j]);
+	}
+	printf("\n");
 }

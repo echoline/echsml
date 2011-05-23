@@ -33,13 +33,18 @@ struct node {
 	Node *parent;
 	Child **children;
 	int numchildren;
-	Attrib *attribs;
+	Attrib **attribs;
+	int numattribs;
+	char single;
 };
 
 Node *new_node(char *);
-Node *node_add_child(Node *parent, Node *child);
+Node *node_add_child(Node *parent, Node *child, char single);
+Node *node_add_attrib(Node *n, char *name, char *value);
 Node *node_add_text(Node *parent, char *);
 Doc *new_doc();
 Node *doc_new_root(Doc *doc, Node *tmp);
+void printnode(Node*);
+void printdoc(Doc*);
 
 #endif // __DOC_H
