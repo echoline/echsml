@@ -33,12 +33,12 @@ struct node {
 	Node *parent;
 	Child **children;
 	int numchildren;
-	char *innards;
 	Attrib *attribs;
 };
 
 Node *new_node(char *);
 Node *node_add_child(Node *parent, Node *child);
+Node *node_add_text(Node *parent, char *);
 Doc *new_doc();
 Node *doc_new_root(Doc *doc, Node *tmp);
 

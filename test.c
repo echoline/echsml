@@ -11,7 +11,7 @@ void printnode(Node *n) {
 		else
 			exit(-1);
 	}
-	printf("</%s>\n", n->name);
+	printf("</%s>", n->name);
 }
 
 int main(int argc, char **argv) {
@@ -24,7 +24,6 @@ int main(int argc, char **argv) {
 			perror(argv[i]);
 			return -1;
 		}
-		printf("loaded %s to (Doc*)%p\n", argv[i], &doc);
 		doc = new_doc(file);
 		for (j = 0; doc->roots[j]; j++) {
 			printnode(doc->roots[j]);

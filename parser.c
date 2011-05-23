@@ -54,6 +54,14 @@ int doc_parse(Doc *doc) {
 			continue;
 		}
 		
+		if (stateptr) {
+			stateptr++;
+			r = strcspn(stateptr, "<");
+			strncpy(buf, stateptr, r);
+			buf[r] = '\0';
+
+			tmp = node_add_text(tmp, buf);
+		}
 		stateptr = strstr(stateptr? stateptr: txt, "<");
 		if (!stateptr)
 			continue;
@@ -91,6 +99,7 @@ int doc_parse(Doc *doc) {
 		r = cptr - stateptr;
 		strncpy(buf, stateptr, r);
 		buf[r] = '\0';
+		stateptr += r;
 
 		tmp = node_add_child(tmp, new_node(buf));
 	}

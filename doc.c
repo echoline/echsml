@@ -52,3 +52,19 @@ Node *node_add_child(Node *parent, Node *child) {
 	child->parent = parent;
 	return child;
 }
+
+Node *node_add_text(Node *parent, char *txt) {
+	if (!parent || !txt || !strlen(txt))
+		return parent;
+
+	parent->children[parent->numchildren] = (Child*)
+						calloc(1, sizeof(Child));
+	parent->children[parent->numchildren]->u.c = strdup(txt);
+	parent->children[parent->numchildren]->type = CSTR;
+	parent->numchildren++;
+	parent->children = realloc(parent->children,
+				(parent->numchildren + 1) * sizeof(Child*));
+	parent->children[parent->numchildren] = NULL;
+
+	return parent;
+}
