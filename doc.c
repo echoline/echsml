@@ -1,7 +1,10 @@
 #include "doc.h"
 
 Doc *new_doc(FILE *docf) {
-	assert(docf != NULL);
+	if (docf == NULL) {
+		fprintf(stderr, "docf == NULL\n");
+		return NULL;
+	}
 
 	Doc *ret = (Doc*)calloc(1, sizeof(Doc));
 	if (!ret) {
@@ -23,4 +26,29 @@ Node *doc_new_root(Doc *doc, Node *tmp) {
 			sizeof(Node*) * (doc->numroots + 1));
 	doc->roots[doc->numroots] = NULL;
 	return doc->roots[0];
+}
+
+Node *new_node(char *n) {
+	Node *ret = (Node*)calloc(1, sizeof(Node));
+	ret->name = strdup(n);
+	ret->numchildren = 0;
+	ret->children = (Child**)calloc(1, sizeof(Child*));
+	return ret;
+}
+
+Node *node_add_child(Node *parent, Node *child) {
+	if (!parent || !child)
+		return NULL;
+
+	parent->children[parent->numchildren] = (Child*)
+						calloc(1, sizeof(Child));
+	parent->children[parent->numchildren]->u.n = child;
+	parent->children[parent->numchildren]->type = NODE;
+	parent->numchildren++;
+	parent->children = realloc(parent->children,
+				(parent->numchildren + 1) * sizeof(Child*));
+	parent->children[parent->numchildren] = NULL;
+
+	child->parent = parent;
+	return child;
 }

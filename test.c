@@ -4,7 +4,12 @@ void printnode(Node *n) {
 	int i;
 	printf("<%s>", n->name);
 	for (i = 0; n->children[i]; i++) {
-		printnode(n->children[i]);
+		if (n->children[i]->type == NODE)
+			printnode(n->children[i]->u.n);
+		else if (n->children[i]->type == CSTR)
+			printf("%s", n->children[i]->u.c);
+		else
+			exit(-1);
 	}
 	printf("</%s>\n", n->name);
 }
