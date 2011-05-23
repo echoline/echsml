@@ -1,1 +1,8 @@
 a simple XML parser
+
+this function:
+	Doc *new_doc(FILE *);
+
+creates structs based on a well-formed xml document.
+
+See test.c for example and doc.h for stuct definitions.
