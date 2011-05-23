@@ -41,12 +41,14 @@ int doc_parse(Doc *doc) {
 					return 0;
 				cptr = strstr(stateptr, ">");
 				if (!cptr) {
-					return ERANGE;
+					return -1;
 				}
 			}
 			r = cptr - stateptr;
 			strncpy(buf, stateptr, r);
 			buf[r] = '\0';
+			// TODO: store attribs
+			buf[strcspn(buf, "\n\t ")] = '\0';
 			tmp = new_node(buf);
 			stateptr += r;
 
@@ -73,7 +75,7 @@ int doc_parse(Doc *doc) {
 					return 0;
 				cptr = strstr(stateptr, ">");
 				if (!cptr) {
-					return ERANGE;
+					return -1;
 				}
 			}
 			stateptr += 1;
@@ -81,7 +83,7 @@ int doc_parse(Doc *doc) {
 			strncpy(buf, stateptr, r);
 			buf[r] = '\0';
 			if (strcasecmp(buf, tmp->name)) {
-				return EILSEQ;
+				fprintf(stderr, "malformed tag: %s\n", tmp->name);
 			}
 			tmp = tmp->parent;
 			stateptr += r;
@@ -93,12 +95,14 @@ int doc_parse(Doc *doc) {
 				return 0;
 			cptr = strstr(stateptr, ">");
 			if (!cptr) {
-				return ERANGE;
+				return -1;
 			}
 		}
 		r = cptr - stateptr;
 		strncpy(buf, stateptr, r);
 		buf[r] = '\0';
+		// TODO: store attribs
+		buf[strcspn(buf, "\n\t ")] = '\0';
 		stateptr += r;
 
 		tmp = node_add_child(tmp, new_node(buf));

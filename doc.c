@@ -14,7 +14,6 @@ Doc *new_doc(FILE *docf) {
 	ret->file = docf;
 	if (doc_parse(ret)) {
 		perror("doc_parse");
-		return NULL;
 	}
 	return ret;
 }
