@@ -21,6 +21,11 @@ void attrib_parse(Node *n, char *s) {
 	char *p = s;
 	char *name;
 	char *value;
+
+	int r = strlen(s)-1;
+	if (s[r] == '/')
+		s[r] = '\0';
+
 	while (*p) {
 		p += strspn(p, "\n\t ");
 		if (!strchr(p, '='))
@@ -30,7 +35,7 @@ void attrib_parse(Node *n, char *s) {
 		name = strdup(p);
 		p += strlen(p) + 1;
 			
-		p[strcspn(p, "\n\t /")] = '\0';
+		p[strcspn(p, "\n\t ")] = '\0';
 		value = strdup(p);
 		p += strlen(p) + 1;
 
@@ -44,6 +49,7 @@ int doc_parse(Doc *doc) {
 	char *cptr = NULL;
 	char *stateptr = NULL;
 	int r;
+	int s;
 	Node *tmp = NULL;
 
 	doc->numroots = 0;
@@ -71,9 +77,18 @@ int doc_parse(Doc *doc) {
 			r = cptr - stateptr;
 			strncpy(buf, stateptr, r);
 			buf[r] = '\0';
-			buf[strcspn(buf, "\n\t /")] = '\0';
+			buf[strcspn(buf, "\n\t ")] = '\0';
 			stateptr += r;
+		
+			s = (*(stateptr-1) == '/');
+			if (s) {
+				r = strlen(buf);
+				if (r && (buf[r-1] == '/')) 
+					buf[r-1] = '\0';
+	 		}
+			
 			tmp = new_node(buf);
+			tmp->single = s;
 
 			cptr = buf + strlen(buf) + 1;
 			attrib_parse(tmp, cptr);
@@ -136,11 +151,16 @@ int doc_parse(Doc *doc) {
 		r = cptr - stateptr;
 		strncpy(buf, stateptr, r);
 		buf[r] = '\0';
-		buf[strcspn(buf, "\n\t /")] = '\0';
+		buf[strcspn(buf, "\n\t ")] = '\0';
 		stateptr += r;
 
-		r = (*(stateptr - 1) == '/');
-		tmp = node_add_child(tmp, new_node(buf), r);
+		s = (*(stateptr - 1) == '/');
+		if (s) {
+			r = strlen(buf);
+			if (r && (buf[r-1] == '/')) 
+				buf[r-1] = '\0';
+	 	}
+		tmp = node_add_child(tmp, new_node(buf), s);
 
 		cptr = buf + strlen(buf) + 1;
 		attrib_parse(tmp, cptr);
