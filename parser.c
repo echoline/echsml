@@ -165,7 +165,7 @@ int doc_parse(Doc *doc) {
 		cptr = buf + strlen(buf) + 1;
 		attrib_parse(tmp, cptr);
 
-		if (r) {
+		if (s) {
 			tmp = tmp->parent;
 		}
 	}
