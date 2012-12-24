@@ -14,6 +14,18 @@ char *pushtxt(FILE *file, char *txt, char *stateptr) {
 	return fgets(&txt[len], BUFSIZ-len-1, file);
 }
 
+char validtagname (char *str) {
+	char *p = str;
+
+	while (*p) {
+		if (!isalpha(*p))
+			return 0;
+		p++;
+	}
+
+	return 1;
+}
+
 void attrib_parse(Node *n, char *s) {
 	if (!n || !s || !strlen(s))
 		return;
@@ -86,6 +98,11 @@ int doc_parse(Doc *doc) {
 				if (r && (buf[r-1] == '/')) 
 					buf[r-1] = '\0';
 	 		}
+
+			if (!validtagname(buf)) {
+				fprintf (stderr, "comment?  %s\n", buf);
+				continue;
+			}
 			
 			tmp = new_node(buf);
 			tmp->single = s;

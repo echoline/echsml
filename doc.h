@@ -1,5 +1,11 @@
 #ifndef __DOC_H
 #define __DOC_H
+
+#ifdef __cplusplus
+namespace echsml {
+	extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -46,5 +52,10 @@ Doc *new_doc();
 Node *doc_new_root(Doc *doc, Node *tmp);
 void printnode(Node*);
 void printdoc(Doc*);
+
+#ifdef __cplusplus
+	}
+}
+#endif
 
 #endif // __DOC_H
