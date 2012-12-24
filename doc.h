@@ -52,6 +52,7 @@ Doc *new_doc();
 Node *doc_new_root(Doc *doc, Node *tmp);
 void printnode(Node*);
 void printdoc(Doc*);
+int doc_parse(Doc *);
 
 #ifdef __cplusplus
 	}

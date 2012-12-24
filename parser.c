@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "doc.h"
 
 char *pushtxt(FILE *file, char *txt, char *stateptr) {
 	int len;
@@ -14,7 +14,7 @@ char *pushtxt(FILE *file, char *txt, char *stateptr) {
 	return fgets(&txt[len], BUFSIZ-len-1, file);
 }
 
-char validtagname (char *str) {
+char stralpha (char *str) {
 	char *p = str;
 
 	while (*p) {
@@ -90,28 +90,33 @@ int doc_parse(Doc *doc) {
 			strncpy(buf, stateptr, r);
 			buf[r] = '\0';
 			buf[strcspn(buf, "\n\t ")] = '\0';
-			stateptr += r;
 		
-			s = (*(stateptr-1) == '/');
+			s = (*(stateptr-1+r) == '/');
 			if (s) {
-				r = strlen(buf);
-				if (r && (buf[r-1] == '/')) 
-					buf[r-1] = '\0';
+				s = strlen(buf);
+				if (s && (buf[s-1] == '/')) 
+					buf[s-1] = '\0';
+				s = 1;
 	 		}
 
-			if (!validtagname(buf)) {
-				fprintf (stderr, "comment?  %s\n", buf);
-				continue;
+			if (!stralpha(buf)) {
+				s = 2;
+				r = cptr - stateptr;
+				strncpy(buf, stateptr, r);
+				buf[r] = '\0';
+			} else {
+				cptr++;
 			}
-			
 			tmp = new_node(buf);
 			tmp->single = s;
 
-			cptr = buf + strlen(buf) + 1;
+			stateptr += r;
+
+			cptr = buf + strlen(buf);
 			attrib_parse(tmp, cptr);
 
 			doc_new_root(doc, tmp);
-			if (*(stateptr - 1) == '/')
+			if (s)
 				tmp = NULL;
 			continue;
 		}

@@ -6,7 +6,7 @@ test: doc.o parser.o test.c
 doc.o: doc.c doc.h
 	cc -g -c doc.c
 
-parser.o: parser.c parser.h
+parser.o: parser.c doc.h
 	cc -g -c parser.c
 
 clean:

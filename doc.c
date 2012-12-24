@@ -93,7 +93,9 @@ void printnode(Node *n) {
 		for (i = 0; n->attribs[i]; i++) {
 			printf(" %s=%s", n->attribs[i]->name, n->attribs[i]->value);
 		}
-		printf("/>");
+		if (n->single == 1)
+			printf("/");
+		printf(">");
 		return;
 	}
 	printf("<%s", n->name);
